@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
-import Login from "../pages/Login";
+import Login from "../pages/auth/Login";
 
 function AppRoutes() {
   return (
