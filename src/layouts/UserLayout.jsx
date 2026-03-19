@@ -8,7 +8,7 @@ export default function UserLayout() {
       <UserSidebar />
 
       {/* Main content */}
-      <div className="flex-1 bg-gray-100 p-6 overflow-auto">
+      <div className="flex-1 ml-64 bg-gray-100 p-6 overflow-auto">
         <Outlet />
       </div>
     </div>

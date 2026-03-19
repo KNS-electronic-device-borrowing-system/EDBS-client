@@ -3,7 +3,11 @@ import AuthLayout from "../layouts/AuthLayout";
 import UserLayout from "../layouts/UserLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
+// Auth pages
 import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import OTPPage from "../pages/auth/OTPpage";
+import SuccessPage from "../pages/auth/SuccessPage";
 
 // User pages
 import HomePage from "../pages/user/HomePage";
@@ -16,6 +20,7 @@ import Users from "../pages/admin/Users";
 import Assets from "../pages/admin/Assets";
 import Requests from "../pages/admin/Requests";
 
+
 function AppRoutes() {
   return (
     <>
@@ -23,7 +28,10 @@ function AppRoutes() {
         {/* Auth */}
         <Route element={<AuthLayout />}>
           <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Route>
+        <Route path="/register/otp" element={<OTPPage />} />
+        <Route path="/register/success" element={<SuccessPage />} />
 
         {/* User */}
         <Route element={<UserLayout />}>
