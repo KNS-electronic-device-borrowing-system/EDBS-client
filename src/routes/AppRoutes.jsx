@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
 import UserLayout from "../layouts/UserLayout";
 import AdminLayout from "../layouts/AdminLayout";
@@ -33,11 +33,12 @@ function AppRoutes() {
         </Route>
 
         {/* Admin */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/assets" element={<Assets />} />
-          <Route path="/admin/requests" element={<Requests />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="assets" element={<Assets />} />
+          <Route path="requests" element={<Requests />} />
         </Route>
       </Routes>
     </>

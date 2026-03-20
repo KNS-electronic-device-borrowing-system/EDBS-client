@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Home, Users, Box, List, LogOut } from "lucide-react";
 import UserInfo from "../common/UserInfo";
 
-export default function AdminLayout({ children }) {
+export default function AdminLayout() {
   const { pathname } = useLocation();
 
   const menu = [
@@ -26,11 +26,7 @@ export default function AdminLayout({ children }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-200 to-blue-300 text-white shadow-md"
-                      : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${isActive? "bg-gradient-to-r from-blue-200 to-blue-300 text-white shadow-md": "text-gray-700 hover:bg-blue-100 hover:text-blue-700"}`}
                 >
                   <Icon
                     size={20}

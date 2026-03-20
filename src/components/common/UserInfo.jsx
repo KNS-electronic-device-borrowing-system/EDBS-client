@@ -3,16 +3,16 @@ import { LogOut } from "lucide-react";
 export default function UserInfo() {
   return (
     <div className="p-4 border-t border-gray-200 bg-white rounded-t-lg shadow-inner">
-      {/* User Info */}
+      {/* User Info sẽ fetch những cái thông tin mà người dùng nhập vô, nếu có trong database */}
       <div className="flex items-center gap-3">
-        {/* Avatar */}
+        {/* Avatar fetch từ data nếu có */}
         <img
-          src="https://i.pravatar.cc/150?img=3" 
+          src="https://i.pravatar.cc/150?img=1" 
           alt="User Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />
         <div>
-          <p className="text-sm font-semibold text-gray-800">SE190000</p>
+          <p className="text-sm font-semibold text-gray-800">SE190000</p>        {/*fetch từ data nếu có */}
           <p className="text-xs text-gray-500">email@gmail.com</p>
         </div>
       </div>
