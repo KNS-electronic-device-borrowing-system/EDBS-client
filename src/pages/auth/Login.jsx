@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { loginAPI } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
+  
 
 function Login() {
+  const { setUser } = useAuth();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -57,10 +61,23 @@ function Login() {
     setLoading(true);
 
     try {
-      console.log("DATA LOGIN:", form);
+      const res = await loginAPI(form);
 
-      // 👉 call API ở đây
-      // navigate("/homepage");
+      const { token, user } = res.data;
+
+      // lưu local
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // set context
+      setUser(user);
+
+      // redirect theo role
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/homepage");
+      }
     } catch (err) {
       setErrors({ general: "Đăng nhập thất bại!" });
     } finally {
@@ -68,7 +85,6 @@ function Login() {
     }
   };
 
-  // 👉 class dùng chung
   const inputClass = (error) =>
     `w-full px-4 py-2 border rounded-md outline-none pr-10 transition-all duration-200 ${
       error

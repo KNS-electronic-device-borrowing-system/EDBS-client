@@ -6,8 +6,8 @@ import AdminLayout from "../layouts/AdminLayout";
 // Auth pages
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
-import OTPPage from "../pages/auth/OTPpage";
 import SuccessPage from "../pages/auth/SuccessPage";
+import VerifyEmail from "../pages/auth/VerifyEmail";
 
 // User pages
 import HomePage from "../pages/user/HomePage";
@@ -30,8 +30,8 @@ function AppRoutes() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Route>
-        <Route path="/register/otp" element={<OTPPage />} />
         <Route path="/register/success" element={<SuccessPage />} />
+        <Route path="/register/verify-email" element={<VerifyEmail />} />
 
         {/* User */}
         <Route element={<UserLayout />}>

@@ -12,10 +12,10 @@ function AuthLayout() {
 
       {/* RIGHT - IMAGE */}
       <div className="hidden lg:flex w-1/2 items-center justify-center bg-white relative overflow-hidden">
-        {/* Background effect to hơn */}
+        {/* Background effect*/}
         <div className="absolute w-[400px] h-[400px] bg-blue-100 rounded-full blur-3xl opacity-60"></div>
 
-        {/* Image TO HƠN */}
+        {/* Image*/}
         <img
           src="/auth-image.png"
           alt="auth"

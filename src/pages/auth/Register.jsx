@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { registerAPI } from "../../services/authService";
 
 function Register() {
   const [form, setForm] = useState({
@@ -13,73 +14,63 @@ function Register() {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [popupMessage, setPopupMessage] = useState(""); // message popup
 
   const navigate = useNavigate();
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const validate = () => {
     const newErrors = {};
-
-    if (!form.fullname) {
-      newErrors.fullname = "Vui lòng nhập họ tên";
-    }
-
-    if (!form.email) {
-      newErrors.email = "Vui lòng nhập email";
-    } else if (!validateEmail(form.email)) {
-      newErrors.email = "Email không hợp lệ";
-    }
-
-    if (!form.password) {
-      newErrors.password = "Vui lòng nhập mật khẩu";
-    } else if (form.password.length < 6) {
+    if (!form.fullname) newErrors.fullname = "Vui lòng nhập họ tên";
+    if (!form.email) newErrors.email = "Vui lòng nhập email";
+    else if (!validateEmail(form.email)) newErrors.email = "Email không hợp lệ";
+    if (!form.password) newErrors.password = "Vui lòng nhập mật khẩu";
+    else if (form.password.length < 6)
       newErrors.password = "Mật khẩu phải từ 6 ký tự";
-    }
-
-    if (!form.confirmPassword) {
+    if (!form.confirmPassword)
       newErrors.confirmPassword = "Vui lòng xác nhận mật khẩu";
-    } else if (form.password !== form.confirmPassword) {
+    else if (form.password !== form.confirmPassword)
       newErrors.confirmPassword = "Mật khẩu không khớp";
-    }
-
     return newErrors;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // clear lỗi của field đang nhập
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const validateErrors = validate();
-
     if (Object.keys(validateErrors).length > 0) {
       setErrors(validateErrors);
       return;
     }
 
-    console.log(form);
-    navigate("/register/otp");
+    try {
+      const res = await registerAPI({
+        email: form.email,
+        password: form.password,
+        fullName: form.fullname,
+      });
+
+      setPopupMessage(res.message || "Vui lòng kiểm tra email để xác nhận!");
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, general: err }));
+    }
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-md">
+    <div className="bg-white p-8 rounded-xl shadow-md relative">
       <h2 className="text-2xl font-bold mb-4 text-center">Đăng Ký</h2>
+
+      {errors.general && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md text-center mb-4">
+          {errors.general}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} noValidate>
         {/* Fullname */}
@@ -134,7 +125,6 @@ function Register() {
                 : "border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
             }`}
           />
-
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -142,7 +132,6 @@ function Register() {
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-
           {errors.password && (
             <p className="text-red-500 text-sm mt-1">{errors.password}</p>
           )}
@@ -162,7 +151,6 @@ function Register() {
                 : "border-gray-300 focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
             }`}
           />
-
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -170,7 +158,6 @@ function Register() {
           >
             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-
           {errors.confirmPassword && (
             <p className="text-red-500 text-sm mt-1">
               {errors.confirmPassword}
@@ -208,6 +195,23 @@ function Register() {
           Đăng nhập
         </span>
       </p>
+
+      {/* Popup Check Email */}
+      {popupMessage && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl text-center w-11/12 max-w-sm transform scale-90 animate-scaleUp">
+            <p className="mb-6 text-gray-700 text-base md:text-lg">
+              {popupMessage}
+            </p>
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 hover:shadow-lg transition-all duration-300"
+              onClick={() => navigate("/")} // quay về login
+            >
+              Quay lại Đăng nhập
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
