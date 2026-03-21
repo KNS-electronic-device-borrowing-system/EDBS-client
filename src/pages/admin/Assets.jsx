@@ -15,6 +15,10 @@ const INITIAL_DATA = Array.from({ length: 108 }, (_, i) => ({
   category: ["Laptop", "Tablet", "Trình chiếu", "Camera", "Phụ kiện"][i % 5],
   brand: ["Dell", "Apple", "Epson", "Sony", "Keychron"][i % 5],
   status: ["Sẵn sàng", "Đang mượn", "Bảo trì", "Ngừng dùng"][i % 4],
+  createdAt: "30/11/2023 15:34",
+  updatedAt: "30/11/2023 15:34",
+  createdBy: `SE${190000 + (i % 10)}`,
+  updatedBy: `SE${190000 + (i % 10)}`,
 }));
 
 const STATUS_STYLE = {
@@ -25,7 +29,6 @@ const STATUS_STYLE = {
 };
 
 const PAGE_SIZE = 10;
-
 const EMPTY_FORM = {
   code: "",
   name: "",
@@ -124,19 +127,14 @@ function Pagination({ current, total, onChange }) {
 // ─── Modal Thêm / Chỉnh sửa ──────────────────────────────────────────────────
 function AssetModal({ mode, initial, onClose, onSave }) {
   const [form, setForm] = useState(initial || EMPTY_FORM);
-
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
   }
-
   function handleSave() {
     if (!form.code.trim() || !form.name.trim()) return;
     onSave(form);
     onClose();
   }
-
-  const title = mode === "add" ? "Thêm thiết bị" : "Chỉnh sửa thiết bị";
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
@@ -146,9 +144,10 @@ function AssetModal({ mode, initial, onClose, onSave }) {
         className="bg-white rounded-2xl w-full max-w-md mx-4 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-base font-medium text-gray-800">{title}</h2>
+          <h2 className="text-base font-medium text-gray-800">
+            {mode === "add" ? "Thêm thiết bị" : "Chỉnh sửa thiết bị"}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -166,8 +165,6 @@ function AssetModal({ mode, initial, onClose, onSave }) {
             </svg>
           </button>
         </div>
-
-        {/* Body */}
         <div className="px-6 py-5 flex flex-col gap-4">
           {[
             { label: "Mã SP", field: "code", placeholder: "VD: D1215" },
@@ -192,7 +189,6 @@ function AssetModal({ mode, initial, onClose, onSave }) {
               />
             </div>
           ))}
-
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">
               Trạng thái
@@ -210,8 +206,6 @@ function AssetModal({ mode, initial, onClose, onSave }) {
             </select>
           </div>
         </div>
-
-        {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
           <button
             onClick={onClose}
@@ -275,14 +269,142 @@ function ConfirmDelete({ row, onClose, onConfirm }) {
   );
 }
 
+// ─── Detail Popup (bấm ...) ───────────────────────────────────────────────────
+function DetailPopup({ row, onClose, onEdit }) {
+  if (!row) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl w-full max-w-md mx-4 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-base font-medium text-gray-800">
+            Thông tin thiết bị
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 flex flex-col gap-4 max-h-[65vh] overflow-y-auto">
+          {/* Ảnh + thông tin cơ bản */}
+          <div className="flex gap-4 items-start">
+            <div className="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {row.image ? (
+                <img
+                  src={row.image}
+                  alt={row.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#9ca3af"
+                  strokeWidth="1.5"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5 text-sm flex-1">
+              {[
+                ["Mã thiết bị", row.code],
+                ["Tên thiết bị", row.name],
+                ["Tên hãng", row.brand],
+                ["Tên danh mục", row.category],
+              ].map(([label, value]) => (
+                <div key={label} className="flex gap-2">
+                  <span className="text-gray-400 w-28 flex-shrink-0">
+                    {label}
+                  </span>
+                  <span className="font-medium text-gray-800">{value}</span>
+                </div>
+              ))}
+              <div className="flex gap-2 items-center">
+                <span className="text-gray-400 w-28 flex-shrink-0">
+                  Trạng thái
+                </span>
+                <Badge status={row.status} />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-100" />
+
+          {/* Thông tin audit */}
+          <div className="flex flex-col gap-1.5 text-sm">
+            {[
+              ["Ngày tạo", row.createdAt],
+              ["Ngày cập nhật", row.updatedAt],
+              ["Người tạo", row.createdBy],
+              ["Người cập nhật", row.updatedBy],
+            ].map(([label, value]) => (
+              <div key={label} className="flex gap-2">
+                <span className="text-gray-400 w-32 flex-shrink-0">
+                  {label}
+                </span>
+                <span className="text-gray-800">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
+          <button
+            onClick={() => {
+              onEdit(row);
+              onClose();
+            }}
+            className="px-5 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+          >
+            Chỉnh sửa
+          </button>
+          <button
+            onClick={onClose}
+            className="px-5 py-2 text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function Assets() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [data, setData] = useState(INITIAL_DATA);
-  const [editRow, setEditRow] = useState(null); // row đang chỉnh sửa
-  const [deleteRow, setDeleteRow] = useState(null); // row đang xóa
-  const [showAdd, setShowAdd] = useState(false); // modal thêm mới
+  const [editRow, setEditRow] = useState(null);
+  const [deleteRow, setDeleteRow] = useState(null);
+  const [detailRow, setDetailRow] = useState(null); // popup ...
+  const [showAdd, setShowAdd] = useState(false);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -310,12 +432,27 @@ export default function Assets() {
   // TODO: thay bằng API call thật
   function handleAdd(form) {
     const newId = Math.max(...data.map((d) => d.id)) + 1;
-    setData((prev) => [{ ...form, id: newId, image: null }, ...prev]);
+    setData((prev) => [
+      {
+        ...form,
+        id: newId,
+        image: null,
+        createdAt: new Date().toLocaleString("vi-VN"),
+        updatedAt: new Date().toLocaleString("vi-VN"),
+        createdBy: "SE190000",
+        updatedBy: "SE190000",
+      },
+      ...prev,
+    ]);
   }
 
   function handleEdit(form) {
     setData((prev) =>
-      prev.map((r) => (r.id === editRow.id ? { ...r, ...form } : r)),
+      prev.map((r) =>
+        r.id === editRow.id
+          ? { ...r, ...form, updatedAt: new Date().toLocaleString("vi-VN") }
+          : r,
+      ),
     );
   }
 
@@ -463,6 +600,7 @@ export default function Assets() {
                             Xóa
                           </button>
                           <button
+                            onClick={() => setDetailRow(r)}
                             className="p-1 text-gray-400 hover:text-gray-600 rounded transition-colors"
                             title="Chi tiết"
                           >
@@ -521,6 +659,13 @@ export default function Assets() {
         row={deleteRow}
         onClose={() => setDeleteRow(null)}
         onConfirm={handleDelete}
+      />
+
+      {/* Detail popup */}
+      <DetailPopup
+        row={detailRow}
+        onClose={() => setDetailRow(null)}
+        onEdit={(r) => setEditRow(r)}
       />
     </>
   );
