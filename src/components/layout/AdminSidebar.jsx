@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, Box, List, LogOut } from "lucide-react";
+import { Home, Users, Box, List, LogOut, Tag, Layers } from "lucide-react";
 import UserInfo from "../common/UserInfo";
 
 export default function AdminLayout() {
@@ -9,7 +9,9 @@ export default function AdminLayout() {
     { name: "Dashboard", path: "/admin/dashboard", icon: Home },
     { name: "Quản Lý Người Dùng", path: "/admin/users", icon: Users },
     { name: "Quản Lý Thiết Bị", path: "/admin/assets", icon: Box },
-    { name: "Danh Sách Yêu Cầu", path: "/admin/requests", icon: List }
+    { name: "Danh Sách Yêu Cầu", path: "/admin/requests", icon: List },
+    { name: "Quản Lý Hãng", path: "/admin/brands", icon: Tag },
+    { name: "Quản Lý Danh Mục", path: "/admin/categories", icon: Layers },
   ];
 
   return (

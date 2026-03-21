@@ -15,6 +15,7 @@ import Dashboard from "../pages/admin/Dashboard";
 import Users from "../pages/admin/Users";
 import Assets from "../pages/admin/Assets";
 import Requests from "../pages/admin/Requests";
+import Categories from "../pages/admin/Categories";
 
 function AppRoutes() {
   return (
@@ -39,6 +40,7 @@ function AppRoutes() {
           <Route path="users" element={<Users />} />
           <Route path="assets" element={<Assets />} />
           <Route path="requests" element={<Requests />} />
+          <Route path="categories" element={<Categories />} />
         </Route>
       </Routes>
     </>
