@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { loginAPI } from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
-  
+import { toast } from "react-toastify";
 
 function Login() {
   const { setUser } = useAuth();
@@ -61,25 +61,26 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await loginAPI(form);
+      const res=await loginAPI(form);
 
-      const { token, user } = res.data;
+      const user=res.user;
 
-      // lưu local
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      // set context
-      setUser(user);
+      // const res = await getMeAPI();
+      // setUser(res.data);
 
       // redirect theo role
-      if (user.role === "admin") {
+      if (user.roleName === "Admin") {
         navigate("/admin/dashboard");
-      } else {
+      } else if (user.roleName === "Borrower") {
         navigate("/homepage");
+      } else {
+        navigate("/");
       }
+
+      toast.success("Đăng nhập thành công 🎉");
     } catch (err) {
-      setErrors({ general: "Đăng nhập thất bại!" });
+      const message = err || "Đăng nhập thất bại!";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -138,13 +139,6 @@ function Login() {
           <p className="text-red-500 text-sm mt-1">{errors.password}</p>
         )}
       </div>
-
-      {/* General error */}
-      {errors.general && (
-        <p className="text-red-500 text-sm text-center mb-3">
-          {errors.general}
-        </p>
-      )}
 
       {/* Button */}
       <button

@@ -1,15 +1,13 @@
 import axiosClient from "./axiosClient";
 export const registerAPI = async (data) => {
   try {
-    console.log("CALL REGISTER API", data);
     const res = await axiosClient.post("/auth/register", {
       email: data.email,
       password: data.password,
       fullName: data.fullName,
     });
-     console.log("res", res.data);
+    console.log("res", res.data);
     return res.data;
-    
   } catch (err) {
     console.log("ERR", err);
     throw err.response?.data?.message || "Đăng ký thất bại";
@@ -18,9 +16,7 @@ export const registerAPI = async (data) => {
 
 export const verifyEmailAPI = async (token) => {
   try {
-    const res = await axiosClient.get(
-      `/auth/register/verify-email?token=${token}`,
-    );
+    const res = await axiosClient.post("/auth/verify-email", { token: token });
 
     return res.data;
   } catch (err) {
@@ -29,49 +25,79 @@ export const verifyEmailAPI = async (token) => {
   }
 };
 
-//mock api
-export const loginAPI = (data) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (data.email === "admin@gmail.com" && data.password === "123456") {
-        resolve({
-          data: {
-            token: "fake-admin-token",
-            user: {
-              name: "Admin",
-              email: data.email,
-              role: "admin",
-              avatar: "https://i.pravatar.cc/150?img=3",
-            },
-          },
-        });
-      } else if (
-        data.email === "user@gmail.com" &&
-        data.password === "123456"
-      ) {
-        resolve({
-          data: {
-            token: "fake-user-token",
-            user: {
-              name: "User",
-              email: data.email,
-              role: "user",
-              avatar: "https://i.pravatar.cc/150?img=5",
-            },
-          },
-        });
-      } else {
-        reject("Sai tài khoản hoặc mật khẩu");
-      }
-    }, 800);
-  });
+export const resendVerificationAPI = async (email) => {
+  try {
+    const res = await axiosClient.post("/auth/resend-verification", {
+      email: email,
+    });
+
+    console.log("RESEND EMAIL RES:", res.data);
+    return res.data;
+  } catch (err) {
+    console.log("RESEND EMAIL ERROR:", err.response);
+
+    throw err.response?.data?.message || "Gửi lại email thất bại";
+  }
+};
+
+export const loginAPI = async (data) => {
+  try {
+    const res = await axiosClient.post("/auth/login", {
+      email: data.email,
+      password: data.password,
+    });
+    console.log("LOGIN RES:", res.data);
+    const result = res.data.data.user;
+    console.log("USER INFO:", result);
+
+    // Lưu token
+    localStorage.setItem("accessToken", result.accessToken);
+    localStorage.setItem("refreshToken", result.refreshToken);
+
+    return result;
+  } catch (err) {
+    console.log("LOGIN ERROR:", err.response);
+
+    throw err.response?.data?.message || "Đăng nhập thất bại";
+  }
+};
+
+export const refreshTokenAPI = async () => {
+  try {
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!refreshToken) {
+      throw "Không có refresh token";
+    }
+
+    const res = await axiosClient.post("/auth/refresh-token", {
+      refreshToken: refreshToken,
+    });
+
+    console.log("REFRESH TOKEN RES:", res.data);
+
+    const { accessToken, refreshToken: newRefreshToken } = res.data.data;
+
+    // cập nhật token mới
+    localStorage.setItem("accessToken", accessToken);
+
+    if (newRefreshToken) {
+      localStorage.setItem("refreshToken", newRefreshToken);
+    }
+
+    return accessToken;
+  } catch (err) {
+    console.log("REFRESH TOKEN ERROR:", err);
+
+    throw err.response?.data?.message || "Refresh token thất bại";
+  }
 };
 
 export const getMeAPI = () => {
-  return new Promise((resolve) => {
+  try {
     const user = JSON.parse(localStorage.getItem("user"));
-    resolve({ data: user });
-  });
+    return { data: user };
+  } catch {
+    return { data: null };
+  }
 };
-
-
