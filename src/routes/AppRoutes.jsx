@@ -31,7 +31,7 @@ function AppRoutes() {
           <Route path="/register" element={<Register />} />
         </Route>
         <Route path="/register/success" element={<SuccessPage />} />
-        <Route path="/register/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* User */}
         <Route element={<UserLayout />}>
