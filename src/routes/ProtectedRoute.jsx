@@ -1,15 +1,20 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-function ProtectedRoute({ children, role }) {
+function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) return <p>Loading...</p>;
 
-  if (!user) return <Navigate to="/" />;
+  // chưa login
+  if (!user) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
 
-  if (role && user.role !== role) {
-    return <Navigate to="/" />;
+  // sai role
+  if (allowedRoles && !allowedRoles.includes(user.roleName)) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return children;

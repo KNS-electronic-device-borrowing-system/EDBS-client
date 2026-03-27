@@ -1,4 +1,7 @@
 import { Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+
 import AuthLayout from "../layouts/AuthLayout";
 import UserLayout from "../layouts/UserLayout";
 import AdminLayout from "../layouts/AdminLayout";
@@ -6,7 +9,6 @@ import AdminLayout from "../layouts/AdminLayout";
 // Auth pages
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
-import SuccessPage from "../pages/auth/SuccessPage";
 import VerifyEmail from "../pages/auth/VerifyEmail";
 
 // User pages
@@ -20,35 +22,48 @@ import Users from "../pages/admin/Users";
 import Assets from "../pages/admin/Assets";
 import Requests from "../pages/admin/Requests";
 
-
 function AppRoutes() {
   return (
-    <>
-      <Routes>
-        {/* Auth */}
-        <Route element={<AuthLayout />}>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Route>
-        <Route path="/register/success" element={<SuccessPage />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
+    <Routes>
+      {/* ========== AUTH ========== */}
+      <Route element={<AuthLayout />}>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
+      <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* User */}
-        <Route element={<UserLayout />}>
-          <Route path="/homepage" element={<HomePage />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
+      {/* ========== USER ========== */}
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={["Borrower", "Admin"]}>
+            <UserLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/homepage" element={<HomePage />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
 
-        {/* Admin */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/assets" element={<Assets />} />
-          <Route path="/admin/requests" element={<Requests />} />
-        </Route>
-      </Routes>
-    </>
+      {/* Admin */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["Admin"]}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="users" element={<Users />} />
+        <Route path="assets" element={<Assets />} />
+        <Route path="requests" element={<Requests />} />
+      </Route>
+
+      {/* ========== FALLBACK ========== */}
+      <Route path="*" element={<div>404 Not Found</div>} />
+    </Routes>
   );
 }
 

@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 
 function Login() {
-  const { setUser } = useAuth();
+  const { fetchUser } = useAuth();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -61,17 +61,15 @@ function Login() {
     setLoading(true);
 
     try {
-      const res=await loginAPI(form);
+      await loginAPI(form);
 
-      const user=res.user;
-
-      // const res = await getMeAPI();
-      // setUser(res.data);
+      // lấy user từ context (API /me)
+      const userData = await fetchUser();
 
       // redirect theo role
-      if (user.roleName === "Admin") {
-        navigate("/admin/dashboard");
-      } else if (user.roleName === "Borrower") {
+      if (userData?.roleName === "Admin") {
+        navigate("/admin");
+      } else if (userData?.roleName === "Borrower") {
         navigate("/homepage");
       } else {
         navigate("/");

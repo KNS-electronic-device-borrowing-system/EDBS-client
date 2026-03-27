@@ -8,8 +8,14 @@ export default function UserInfo() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/", { replace: true });
   };
+
+  const avatarUrl =
+    user?.avatarUrl ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      user?.fullName || "User",
+    )}`;
 
   return (
     <div className="p-4 border-t border-gray-200 bg-white rounded-t-lg shadow-inner">
@@ -17,17 +23,14 @@ export default function UserInfo() {
       <div className="flex items-center gap-3">
         {/* Avatar */}
         <img
-          src={
-            user?.avatar ||
-            `https://ui-avatars.com/api/?name=${user?.name || "User"}`
-          }
+          src={avatarUrl}
           alt="User Avatar"
           className="w-10 h-10 rounded-full object-cover"
         />
 
         <div>
           <p className="text-sm font-semibold text-gray-800">
-            {user?.name || "Unknown"}
+            {user?.fullName || "Unknown"}
           </p>
           <p className="text-xs text-gray-500">{user?.email || "No email"}</p>
         </div>

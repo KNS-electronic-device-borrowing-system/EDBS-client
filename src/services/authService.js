@@ -93,11 +93,3 @@ export const refreshTokenAPI = async () => {
   }
 };
 
-export const getMeAPI = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    return { data: user };
-  } catch {
-    return { data: null };
-  }
-};
