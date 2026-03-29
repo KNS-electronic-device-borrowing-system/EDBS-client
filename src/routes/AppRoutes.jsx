@@ -1,9 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+
 import AuthLayout from "../layouts/AuthLayout";
 import UserLayout from "../layouts/UserLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
+// Auth pages
 import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
+import VerifyEmail from "../pages/auth/VerifyEmail";
 
 // User pages
 import HomePage from "../pages/user/HomePage";
@@ -20,32 +25,48 @@ import Categories from "../pages/admin/Categories";
 
 function AppRoutes() {
   return (
-    <>
-      <Routes>
-        {/* Auth */}
-        <Route element={<AuthLayout />}>
-          <Route path="/" element={<Login />} />
-        </Route>
+    <Routes>
+      {/* ========== AUTH ========== */}
+      <Route element={<AuthLayout />}>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
+      <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* User */}
-        <Route element={<UserLayout />}>
-          <Route path="/homepage" element={<HomePage />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
+      {/* ========== USER ========== */}
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={["Borrower", "Admin"]}>
+            <UserLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/homepage" element={<HomePage />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
 
-        {/* Admin */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+      {/* Admin */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute allowedRoles={["Admin"]}>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="assets" element={<Assets />} />
           <Route path="requests" element={<Requests />} />
           <Route path="brands" element={<Brands />} />
           <Route path="categories" element={<Categories />} />
-        </Route>
-      </Routes>
-    </>
+      </Route>
+
+      {/* ========== FALLBACK ========== */}
+      <Route path="*" element={<div>404 Not Found</div>} />
+    </Routes>
   );
 }
 
